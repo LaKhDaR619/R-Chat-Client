@@ -42,7 +42,7 @@ function LoginForm({
     return () => {
       unlisten();
     };
-  }, []);
+  }, [history, resetIE]);
 
   const [keep, setKeep] = useState(true);
 

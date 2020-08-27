@@ -3,8 +3,8 @@ const emptyInputs = { username: "", password: "" };
 const emptyError = { username: "", password: "", other: "" };
 
 const initialState = {
-  user: {},
   loggedIn: false,
+  user: {},
   isLoading: true,
   inputFields: emptyInputs,
   errorMessages: emptyError,
@@ -80,10 +80,7 @@ const loginReducer = (state = initialState, action) => {
         isLoading: false,
         loggedIn: action.loggedIn,
         user: action.user,
-        errorMessages: {
-          ...state.errorMessages,
-          ...action.payload.errorMessage,
-        },
+        errorMessages: emptyError,
       };
     case "SET_AUTH_LOADING":
       return { ...state, isLoading: true };

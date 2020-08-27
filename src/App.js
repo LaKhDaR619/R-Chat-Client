@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
-import Main from "./pages/Main";
 import Login from "./pages/Login";
 import Chat from "./pages/Chat";
 import ProtectedRoute from "./Components/ProtectedRoute";
@@ -18,7 +17,13 @@ function App({ checkLogin, loggedIn, isLoading }) {
 
   return (
     <Router>
-      <Route path="/" exact component={Main} />
+      <ProtectedRoute
+        path="/"
+        exact
+        component={Chat}
+        condition={loggedIn}
+        redirectTo="/login"
+      />
       <ProtectedRoute
         path="/login"
         exact

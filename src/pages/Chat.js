@@ -14,23 +14,13 @@ function Chat() {
       container
       direction="column"
       wrap="nowrap"
-      style={{ height: "100vh", background: "yellow" }}
+      style={{ height: "100vh" }}
       alignItems="stretch"
     >
       <Grid item>
         <Header title="Chat" />
       </Grid>
-      <Grid
-        item
-        container
-        direction="row"
-        style={{ height: "100%", background: "red" }}
-        alignItems="stretch"
-      >
-        <Grid item style={{ background: "green", width: "100%" }}>
-          t
-        </Grid>
-      </Grid>
+      <MainChat />
     </Grid>
   );
 }

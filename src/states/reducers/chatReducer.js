@@ -5,14 +5,10 @@ const initialState = {
 const chatReducer = (state = initialState, action) => {
   console.log(action);
   switch (action.type) {
-    case "GET_FRIENDS_SUCCESS":
+    case "SET_FRIENDS":
       return {
         ...state,
         ...action.payload,
-      };
-    case "GET_FRIENDS_FAILED":
-      return {
-        ...state,
       };
     default:
       return state;

@@ -37,7 +37,7 @@ function RegisterForm({
     return () => {
       unlisten();
     };
-  }, []);
+  }, [history, resetIE]);
 
   const handleRegister = async (e) => {
     userRegister({ ...inputFields, history });
