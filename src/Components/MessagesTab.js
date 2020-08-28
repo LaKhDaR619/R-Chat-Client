@@ -14,30 +14,32 @@ import io from "socket.io-client";
 
 let socket;
 
-function scrollToBottom() {
-  var div = document.getElementById("list");
-  div.scrollTop = div.scrollHeight - div.clientHeight;
-}
+function MessagesTab({
+  friends,
+  setFriends,
+  setRead,
+  selectedIndex,
+  user,
+  scrollToBottom,
+}) {
+  useEffect(() => {
+    scrollToBottom();
+  }, [friends]);
 
-function MessagesTab({ friends, setFriends, selectedIndex, user }) {
   useEffect(() => {
     socket = io("http://localhost:5000");
 
+    // received a message
     socket.on(user.username, (msg) => {
-      let temp;
+      let temp = [...friends];
 
+      // refactor it using findIndex later
       // if the message confirmation
       if (msg.sender === user.username) {
-        console.log("confirmation");
-        console.log(msg);
-
         temp = friends.map((friend) => {
           if (friend.username === msg.receiver) {
             friend.messages = friend.messages.map((message) => {
-              console.log(message);
-              console.log(message.pending && message.message === msg.message);
               if (message.pending && message.message === msg.message) {
-                console.log(message);
                 message.pending = false;
               }
               return message;
@@ -48,23 +50,36 @@ function MessagesTab({ friends, setFriends, selectedIndex, user }) {
       }
       // if we received a message from another user
       else {
-        let senderIsFriend = false;
+        const foundIndex = temp.findIndex(
+          (friend) => friend.username === msg.sender
+        );
 
-        temp = friends.map((friend) => {
-          if (friend.username === msg.sender) {
-            senderIsFriend = true;
-            friend.messages.push(msg);
-          }
-          return friend;
-        });
+        if (foundIndex === 0) setRead(friends, 0);
 
-        if (!senderIsFriend)
-          temp.push({ username: msg.sender, messages: [msg] });
+        // sender in friends
+        if (foundIndex !== -1) {
+          temp[foundIndex].messages.push(msg);
+          temp[foundIndex].unRead = true;
+
+          // getting the sender friend from the array
+          const friend = temp[foundIndex];
+          //delteting the friend from the array
+          temp.splice(foundIndex, 1);
+          // pushing it again at the beggining
+          temp.splice(0, 0, friend);
+        }
+        // sender isn't in friends (so we add it)
+        else {
+          temp.splice(0, 0, {
+            username: msg.sender,
+            messages: [msg],
+            unRead: true,
+          });
+        }
       }
 
+      console.log("81");
       setFriends(temp);
-      setMessage("");
-      scrollToBottom();
     });
   }, [user.username]);
 
@@ -93,7 +108,6 @@ function MessagesTab({ friends, setFriends, selectedIndex, user }) {
       message,
       pending: true,
     };
-    console.log(receiver);
 
     socket.emit("message", receiver);
 
@@ -107,8 +121,8 @@ function MessagesTab({ friends, setFriends, selectedIndex, user }) {
       }
       return friend;
     });
+
     setFriends(temp);
-    scrollToBottom();
   };
 
   return (
@@ -136,8 +150,19 @@ function MessagesTab({ friends, setFriends, selectedIndex, user }) {
           {friends.length > 0 && friends[selectedIndex].messages.length > 0
             ? friends[selectedIndex].messages.map((message, index) => (
                 <ListItem style={{ padding: 0 }} key={index}>
-                  <ListItemText>{`${message.sender}: ${message.message}`}</ListItemText>
-                  {message.pending ? <CircularProgress size={25} /> : null}
+                  <ListItemText
+                    style={{
+                      width: "60%",
+                    }}
+                  >{`${message.sender}: ${message.message}`}</ListItemText>
+                  {message.pending ? (
+                    <CircularProgress
+                      size={25}
+                      style={{
+                        marginRight: "10px",
+                      }}
+                    />
+                  ) : null}
                 </ListItem>
               ))
             : null}
@@ -151,6 +176,9 @@ function MessagesTab({ friends, setFriends, selectedIndex, user }) {
             style={{ width: "100%" }}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key == "Enter") handleSendMessage();
+            }}
           />
         </Grid>
         <Grid item xs={2}>

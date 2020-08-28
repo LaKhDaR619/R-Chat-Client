@@ -3,7 +3,6 @@ const initialState = {
 };
 
 const chatReducer = (state = initialState, action) => {
-  console.log(action);
   switch (action.type) {
     case "SET_FRIENDS":
       return {

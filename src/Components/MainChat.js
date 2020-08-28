@@ -5,7 +5,12 @@ import Friends from "./FriendsTab";
 import { connect } from "react-redux";
 import MessagesTab from "./MessagesTab";
 
-function MainChat({ user, friends, setFriends }) {
+function scrollToBottom() {
+  var div = document.getElementById("list");
+  div.scrollTop = div.scrollHeight - div.clientHeight;
+}
+
+function MainChat({ user, friends, setFriends, setRead }) {
   useLayoutEffect(() => {
     function updateSize() {
       ref.current.style.setProperty(
@@ -26,14 +31,18 @@ function MainChat({ user, friends, setFriends }) {
     <Grid item container direction="row" ref={ref}>
       <Friends
         friends={friends}
+        setRead={setRead}
         selectedIndex={selectedIndex}
         setSelectedIndex={setSelectedIndex}
+        scrollToBottom={scrollToBottom}
       />
       <MessagesTab
         user={user}
         friends={friends}
         setFriends={setFriends}
+        setRead={setRead}
         selectedIndex={selectedIndex}
+        scrollToBottom={scrollToBottom}
       />
     </Grid>
   );
@@ -50,6 +59,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     setFriends: (friends) => {
       dispatch({ type: "SET_FRIENDS", payload: { friends } });
+    },
+    setRead: (friends, index) => {
+      dispatch({ type: "SET_READ", payload: { friends, index } });
     },
   };
 };

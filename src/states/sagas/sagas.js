@@ -6,6 +6,7 @@ import {
   userRegister,
   checkUserName,
 } from "./authSaga";
+import { setRead } from "./chatSaga";
 
 export default function* mySaga() {
   // auth
@@ -14,4 +15,7 @@ export default function* mySaga() {
   yield takeLatest("USER_LOGIN", userLogin);
   yield takeLatest("USER_LOGOUT", userLogout);
   yield takeLatest("CHECK_USERNAME", checkUserName);
+
+  // chat
+  yield takeLatest("SET_READ", setRead);
 }

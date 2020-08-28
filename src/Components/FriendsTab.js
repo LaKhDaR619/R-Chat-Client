@@ -1,4 +1,4 @@
-import React, { useRef, useLayoutEffect } from "react";
+import React, { useRef, useEffect, useLayoutEffect } from "react";
 import {
   Grid,
   List,
@@ -8,9 +8,16 @@ import {
   Typography,
   Box,
   ListItemText,
+  Badge,
 } from "@material-ui/core";
 
-function Friends({ friends, selectedIndex, setSelectedIndex }) {
+function Friends({
+  friends,
+  setRead,
+  selectedIndex,
+  setSelectedIndex,
+  scrollToBottom,
+}) {
   useLayoutEffect(() => {
     function updateSize() {
       ref.current.style.setProperty(
@@ -23,8 +30,15 @@ function Friends({ friends, selectedIndex, setSelectedIndex }) {
     return () => window.removeEventListener("resize", updateSize);
   }, []);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [selectedIndex]);
+
   const handleContactChange = (index) => {
     setSelectedIndex(index);
+
+    // if the messages aren't read
+    if (friends[index].unRead) setRead(friends, index);
   };
 
   const ref = useRef();
@@ -60,6 +74,7 @@ function Friends({ friends, selectedIndex, setSelectedIndex }) {
                 />
               </ListItemAvatar>
               <ListItemText primary={item.username} />
+              {item.unRead ? <Badge color="secondary" variant="dot" /> : null}
             </ListItem>
           );
         })}

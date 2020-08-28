@@ -8,11 +8,9 @@ import Register from "./pages/Register";
 
 function App({ checkLogin, loggedIn, isLoading }) {
   useEffect(() => {
-    console.log("App");
     checkLogin();
   }, [checkLogin]);
 
-  //console.log("App condition");
   if (isLoading) return "loading";
 
   return (

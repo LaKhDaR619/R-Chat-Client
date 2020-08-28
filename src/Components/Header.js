@@ -5,6 +5,7 @@ import {
   Typography,
   Button,
   IconButton,
+  Grid,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
@@ -22,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Header({ loggedIn, logOut }) {
+function Header({ loggedIn, logOut, user }) {
   const classes = useStyles();
   return (
     <AppBar position="static">
@@ -37,9 +38,18 @@ function Header({ loggedIn, logOut }) {
           Chat
         </Typography>
         {loggedIn ? (
-          <Button color="inherit" onClick={logOut}>
-            Logout
-          </Button>
+          <Grid container justify="flex-end" alignItems="center" spacing={2}>
+            <Grid item>
+              <Typography variant="h6" className={classes.title}>
+                {user.username}
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Button color="inherit" onClick={logOut}>
+                Logout
+              </Button>
+            </Grid>
+          </Grid>
         ) : (
           <Button color="inherit">
             <Link
@@ -58,6 +68,7 @@ function Header({ loggedIn, logOut }) {
 const mapStateToProps = (state) => {
   return {
     loggedIn: state.auth.loggedIn,
+    user: state.auth.user,
   };
 };
 
