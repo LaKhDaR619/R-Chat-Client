@@ -9,6 +9,7 @@ import {
   CircularProgress,
   ListItem,
   Button,
+  colors,
 } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 
@@ -98,14 +99,21 @@ function MessagesTab({
 
   useLayoutEffect(() => {
     function updateSize() {
-      if (ref.current)
-        ref.current.style.setProperty(
-          "height",
-          `${document.getElementById("root").clientHeight - 185}px`
-        );
-
-      if (window.innerWidth >= 600) setDisplay("block");
-      else setDisplay(showFriends ? "none" : "block");
+      if (window.innerWidth >= 600) {
+        setDisplay("block");
+        if (ref.current)
+          ref.current.style.setProperty(
+            "height",
+            `${document.getElementById("root").clientHeight - 185}px`
+          );
+      } else {
+        setDisplay(showFriends ? "none" : "block");
+        if (ref.current)
+          ref.current.style.setProperty(
+            "height",
+            `${document.getElementById("root").clientHeight - 177}px`
+          );
+      }
     }
     window.addEventListener("resize", updateSize);
     updateSize();
@@ -124,9 +132,9 @@ function MessagesTab({
   const ref = useRef();
 
   return (
-    <Box
+    <Grid
       item
-      component={Grid}
+      container
       direction="column"
       xs={12}
       sm={8}
@@ -135,19 +143,26 @@ function MessagesTab({
       style={{ display }}
     >
       <Grid item container direction="column" justify="flex-end">
-        <Grid container alignItems="center">
-          <Grid item xs={10}>
+        <Grid
+          item
+          container
+          alignItems="center"
+          style={{ paddingLeft: "10px", paddingRight: "10px" }}
+        >
+          <Grid item sm={12} xs={10}>
             <Typography variant="h4">
               {friends.length > 0 && friends.length > selectedIndex
                 ? friends[selectedIndex].username
                 : "Messages"}
             </Typography>
           </Grid>
-          <Hidden smUp>
-            <Button onClick={backToFriends}>
-              <ArrowBackIcon />
-            </Button>
-          </Hidden>
+          <Grid item xs={2}>
+            <Hidden smUp>
+              <Button size="large" onClick={backToFriends}>
+                <ArrowBackIcon />
+              </Button>
+            </Hidden>
+          </Grid>
         </Grid>
         <List
           id="messages"
@@ -187,7 +202,7 @@ function MessagesTab({
         setMessage={setMessage}
         handleSendMessage={handleSendMessage}
       />
-    </Box>
+    </Grid>
   );
 }
 

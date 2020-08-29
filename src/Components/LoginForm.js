@@ -58,7 +58,7 @@ function LoginForm({
       direction="column"
       className={classes.mgTop}
       xs={10}
-      md={4}
+      md={6}
     >
       <Typography className={classes.center} variant="h2">
         Login

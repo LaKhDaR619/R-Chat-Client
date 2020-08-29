@@ -12,9 +12,9 @@ function Login() {
   return (
     <Grid container direction="row" justify="center">
       <Header />
-      <Grid item xs={1} md={4} />
+      <Grid item xs={1} md={3} />
       <LoginForm />
-      <Grid item xs={1} md={4} />
+      <Grid item xs={1} md={3} />
     </Grid>
   );
 }

@@ -77,6 +77,7 @@ function MainChat({
         showFriends={showFriends}
         backToFriends={backToFriends}
       />
+      <audio id="notification" src={require("../assets/stairs.mp3")} muted />
     </Grid>
   );
 }
