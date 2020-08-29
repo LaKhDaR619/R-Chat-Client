@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useState, useLayoutEffect, useRef } from "react";
 import { Grid } from "@material-ui/core";
 import Friends from "./FriendsTab";
 
@@ -8,7 +8,7 @@ import MessagesTab from "./MessagesTab";
 // scroll messages to bottoms
 function scrollToBottom() {
   let div = document.getElementById("messages");
-  div.scrollTop = div.scrollHeight - div.clientHeight;
+  if (div) div.scrollTop = div.scrollHeight - div.clientHeight;
 }
 
 // scroll friends to top
@@ -33,10 +33,11 @@ function MainChat({
 }) {
   useLayoutEffect(() => {
     function updateSize() {
-      ref.current.style.setProperty(
-        "height",
-        `${document.getElementById("root").clientHeight - 65}px`
-      );
+      if (ref.current)
+        ref.current.style.setProperty(
+          "height",
+          `${document.getElementById("root").clientHeight - 65}px`
+        );
     }
     window.addEventListener("resize", updateSize);
     updateSize();
@@ -44,6 +45,12 @@ function MainChat({
   }, []);
 
   const ref = useRef();
+
+  const [showFriends, setShowFriends] = useState(false);
+
+  const backToFriends = () => {
+    setShowFriends(true);
+  };
 
   return (
     <Grid item container direction="row" ref={ref}>
@@ -53,6 +60,8 @@ function MainChat({
         selectedIndex={selectedIndex}
         setSelectedIndex={setSelectedIndex}
         scrollToBottom={scrollToBottom}
+        showFriends={showFriends}
+        setShowFriends={setShowFriends}
       />
       <MessagesTab
         user={user}
@@ -65,6 +74,8 @@ function MainChat({
         receiveMessage={receiveMessage}
         scrollToBottom={scrollToBottom}
         scrollToTop={scrollToTop}
+        showFriends={showFriends}
+        backToFriends={backToFriends}
       />
     </Grid>
   );

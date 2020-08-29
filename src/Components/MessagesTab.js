@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import {
   Grid,
+  Box,
+  Hidden,
   List,
   Typography,
   ListItemText,
   CircularProgress,
   ListItem,
+  Button,
 } from "@material-ui/core";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 
 import io from "socket.io-client";
 import SendMessageTab from "./SendMessageTab";
@@ -23,10 +27,10 @@ function MessagesTab({
   receiveMessage,
   messageConfirmation,
   scrollToTop,
+  showFriends,
+  backToFriends,
 }) {
   const handleSocketEvent = (msg) => {
-    let temp = [...friends];
-
     // if the message confirmation
     if (msg.sender === user.username) {
       messageConfirmation(msg, setRead);
@@ -47,7 +51,6 @@ function MessagesTab({
 
   const handleSendMessage = () => {
     if (!message) return;
-
     setMessage("");
 
     const receiver = {
@@ -81,7 +84,6 @@ function MessagesTab({
   };
 
   useEffect(() => {
-    // socket = io("http://localhost:5000", { forceNew: true });
     socket = io("/", { forceNew: true });
 
     // received a message
@@ -96,35 +98,57 @@ function MessagesTab({
 
   useLayoutEffect(() => {
     function updateSize() {
-      ref.current.style.setProperty(
-        "height",
-        `${document.getElementById("root").clientHeight - 185}px`
-      );
+      if (ref.current)
+        ref.current.style.setProperty(
+          "height",
+          `${document.getElementById("root").clientHeight - 185}px`
+        );
+
+      if (window.innerWidth >= 600) setDisplay("block");
+      else setDisplay(showFriends ? "none" : "block");
     }
     window.addEventListener("resize", updateSize);
     updateSize();
     return () => window.removeEventListener("resize", updateSize);
-  }, []);
+  }, [showFriends]);
+
+  // display stuff
+  const [display, setDisplay] = useState("block");
+  useEffect(() => {
+    // making use of the size change
+    if (window.innerWidth < 600) {
+      setDisplay(showFriends ? "none" : "block");
+    }
+  }, [showFriends]);
 
   const ref = useRef();
 
   return (
-    <Grid
+    <Box
       item
       component={Grid}
-      container
       direction="column"
       xs={12}
       sm={8}
       lg={9}
       xl={10}
+      style={{ display }}
     >
       <Grid item container direction="column" justify="flex-end">
-        <Typography variant="h4">
-          {friends.length > 0 && friends.length > selectedIndex
-            ? friends[selectedIndex].username
-            : "Messages"}
-        </Typography>
+        <Grid container alignItems="center">
+          <Grid item xs={10}>
+            <Typography variant="h4">
+              {friends.length > 0 && friends.length > selectedIndex
+                ? friends[selectedIndex].username
+                : "Messages"}
+            </Typography>
+          </Grid>
+          <Hidden smUp>
+            <Button onClick={backToFriends}>
+              <ArrowBackIcon />
+            </Button>
+          </Hidden>
+        </Grid>
         <List
           id="messages"
           ref={ref}
@@ -135,16 +159,17 @@ function MessagesTab({
           {friends.length > 0 && friends.length > selectedIndex
             ? friends[selectedIndex].messages.map((message, index) => (
                 <ListItem style={{ padding: 0 }} key={index}>
-                  {message.pending || true ? (
+                  {message.pending ? (
                     <CircularProgress
                       size={25}
-                      variant={message.pending ? "indeterminate" : "static"}
-                      value={0}
+                      variant="indeterminate"
                       style={{
                         marginRight: "10px",
                       }}
                     />
-                  ) : null}
+                  ) : (
+                    <div style={{ width: "35px", height: "25px" }} />
+                  )}
                   <ListItemText>{`${message.sender}: ${message.message}`}</ListItemText>
                 </ListItem>
               ))
@@ -162,7 +187,7 @@ function MessagesTab({
         setMessage={setMessage}
         handleSendMessage={handleSendMessage}
       />
-    </Grid>
+    </Box>
   );
 }
 

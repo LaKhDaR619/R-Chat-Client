@@ -12,7 +12,7 @@ function SendMessageTab({ message, setMessage, handleSendMessage }) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyPress={(e) => {
-            if (e.key == "Enter") handleSendMessage();
+            if (e.key === "Enter") handleSendMessage();
           }}
         />
       </Grid>
