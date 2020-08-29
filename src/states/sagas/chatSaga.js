@@ -16,7 +16,6 @@ export function* setRead({ payload }) {
     } catch (error) {
       console.log(error);
     }
-
     // just changing it locally
     friends[index].unRead = false;
     return { type: "SET_FRIENDS", payload: { friends } };

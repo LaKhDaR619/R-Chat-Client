@@ -55,6 +55,7 @@ function Friends({
       <Typography variant="h4">Friends</Typography>
       <List
         ref={ref}
+        id="friends"
         style={{
           overflowY: "scroll",
         }}

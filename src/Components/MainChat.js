@@ -1,13 +1,24 @@
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useState, useLayoutEffect, useRef } from "react";
 import { Grid } from "@material-ui/core";
 import Friends from "./FriendsTab";
 
 import { connect } from "react-redux";
 import MessagesTab from "./MessagesTab";
 
+// scroll messages to bottoms
 function scrollToBottom() {
-  var div = document.getElementById("list");
+  let div = document.getElementById("messages");
   div.scrollTop = div.scrollHeight - div.clientHeight;
+}
+
+// scroll friends to top
+function scrollToTop() {
+  let friends = document.getElementById("friends");
+  friends.scroll({
+    top: 0,
+    left: 0,
+    behavior: "smooth",
+  });
 }
 
 function MainChat({ user, friends, setFriends, setRead }) {
@@ -23,8 +34,7 @@ function MainChat({ user, friends, setFriends, setRead }) {
     return () => window.removeEventListener("resize", updateSize);
   }, []);
 
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
-
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const ref = useRef();
 
   return (
@@ -42,7 +52,9 @@ function MainChat({ user, friends, setFriends, setRead }) {
         setFriends={setFriends}
         setRead={setRead}
         selectedIndex={selectedIndex}
+        setSelectedIndex={setSelectedIndex}
         scrollToBottom={scrollToBottom}
+        scrollToTop={scrollToTop}
       />
     </Grid>
   );

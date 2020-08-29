@@ -1,5 +1,6 @@
 const initialState = {
   friends: [],
+  selectedIndex: 0,
 };
 
 const chatReducer = (state = initialState, action) => {
@@ -9,6 +10,8 @@ const chatReducer = (state = initialState, action) => {
         ...state,
         ...action.payload,
       };
+    case "MESSAGE_CONFIRMATION": {
+    }
     default:
       return state;
   }

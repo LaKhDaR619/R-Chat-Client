@@ -11,7 +11,7 @@ const initialState = {
 };
 
 const loginReducer = (state = initialState, action) => {
-  console.log(action);
+  //console.log(action);
   switch (action.type) {
     case "CHECK_LOGIN_ASYNC":
       return {
