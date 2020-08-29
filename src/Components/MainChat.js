@@ -21,7 +21,7 @@ function scrollToTop() {
   });
 }
 
-function MainChat({ user, friends, setFriends, setRead }) {
+function MainChat({ user, friends, setFriends, setRead, messageConfirmation }) {
   useLayoutEffect(() => {
     function updateSize() {
       ref.current.style.setProperty(
@@ -53,6 +53,7 @@ function MainChat({ user, friends, setFriends, setRead }) {
         setRead={setRead}
         selectedIndex={selectedIndex}
         setSelectedIndex={setSelectedIndex}
+        messageConfirmation={messageConfirmation}
         scrollToBottom={scrollToBottom}
         scrollToTop={scrollToTop}
       />
@@ -74,6 +75,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     setRead: (friends, index) => {
       dispatch({ type: "SET_READ", payload: { friends, index } });
+    },
+    messageConfirmation: (msg) => {
+      dispatch({ type: "MESSAGE_CONFIRMATION", payload: { msg } });
     },
   };
 };

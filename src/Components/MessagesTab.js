@@ -21,6 +21,7 @@ function MessagesTab({
   selectedIndex,
   setSelectedIndex,
   user,
+  messageConfirmation,
   scrollToBottom,
   scrollToTop,
 }) {
@@ -29,16 +30,7 @@ function MessagesTab({
 
     // if the message confirmation
     if (msg.sender === user.username) {
-      const friendIndex = temp.findIndex(
-        (friend) => friend.username === msg.receiver
-      );
-
-      const messageIndex = temp[friendIndex].messages.findIndex(
-        (message) => message.pending && message.message === msg.message
-      );
-
-      // removing pending
-      temp[friendIndex].messages[messageIndex].pending = false;
+      messageConfirmation(msg);
     }
     // if we received a message from another user
     else {
@@ -116,7 +108,7 @@ function MessagesTab({
       console.log("off");
       socket.off(user.username);
     };
-  }, [user.username, selectedIndex, friends]);
+  }, [user.username, selectedIndex]);
 
   useLayoutEffect(() => {
     function updateSize() {
