@@ -82,7 +82,7 @@ function MessagesTab({
 
   useEffect(() => {
     // socket = io("http://localhost:5000", { forceNew: true });
-    // socket = io("/", { forceNew: true });
+    socket = io("/", { forceNew: true });
 
     // received a message
     console.log("on");
