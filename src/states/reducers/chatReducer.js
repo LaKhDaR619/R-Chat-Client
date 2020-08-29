@@ -40,7 +40,7 @@ const chatReducer = (state = initialState, action) => {
       const temp = [...state.friends];
       let selectedIndex = state.selectedIndex;
 
-      const { msg } = action.payload;
+      const { msg, scrollToTop } = action.payload;
 
       const foundIndex = temp.findIndex(
         (friend) => friend.username === msg.sender
@@ -55,7 +55,7 @@ const chatReducer = (state = initialState, action) => {
           selectedIndex = 0;
           temp[foundIndex].unRead = true;
 
-          //fix scrollToTop();
+          scrollToTop();
         }
         // else we make it unRead
         else {

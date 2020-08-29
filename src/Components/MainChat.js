@@ -92,8 +92,8 @@ const mapDispatchToProps = (dispatch) => {
     messageConfirmation: (msg) => {
       dispatch({ type: "MESSAGE_CONFIRMATION", payload: { msg } });
     },
-    receiveMessage: (msg) => {
-      dispatch({ type: "RECEIVE_MESSAGE", payload: { msg } });
+    receiveMessage: (msg, scrollToTop) => {
+      dispatch({ type: "RECEIVE_MESSAGE", payload: { msg, scrollToTop } });
     },
   };
 };

@@ -11,8 +11,7 @@ import {
 import io from "socket.io-client";
 import SendMessageTab from "./SendMessageTab";
 
-//let socket = io("http://localhost:5000");
-let socket = io("/");
+let socket;
 
 function MessagesTab({
   friends,
@@ -23,11 +22,8 @@ function MessagesTab({
   user,
   receiveMessage,
   messageConfirmation,
-  scrollToBottom,
   scrollToTop,
 }) {
-  // fix scrollToBottom(); problem
-
   const handleSocketEvent = (msg) => {
     let temp = [...friends];
 
@@ -37,7 +33,7 @@ function MessagesTab({
     }
     // if we received a message from another user
     else {
-      receiveMessage(msg);
+      receiveMessage(msg, scrollToTop);
 
       // playing receive message sound
       const notification = document.getElementById("notification");
@@ -47,7 +43,47 @@ function MessagesTab({
     }
   };
 
+  const [message, setMessage] = useState("");
+
+  const handleSendMessage = () => {
+    if (!message) return;
+
+    setMessage("");
+
+    const receiver = {
+      receiver: friends[selectedIndex].username,
+      message,
+      pending: true,
+    };
+
+    const temp = [...friends];
+    const foundIndex = friends.findIndex(
+      (friend) => friend.username === receiver.receiver
+    );
+
+    temp[foundIndex].messages.push({
+      sender: user.username,
+      message,
+      pending: true,
+    });
+
+    // getting friend from the array
+    const friend = temp[foundIndex];
+    //delteting the friend from the array
+    temp.splice(foundIndex, 1);
+    // pushing it again at the beggining
+    temp.splice(0, 0, friend);
+
+    socket.emit("message", receiver);
+
+    setSelectedIndex(0);
+    setFriends(temp);
+  };
+
   useEffect(() => {
+    // socket = io("http://localhost:5000", { forceNew: true });
+    // socket = io("/", { forceNew: true });
+
     // received a message
     console.log("on");
     socket.on(user.username, handleSocketEvent);
@@ -122,6 +158,9 @@ function MessagesTab({
         user={user}
         socket={socket}
         setFriends={setFriends}
+        message={message}
+        setMessage={setMessage}
+        handleSendMessage={handleSendMessage}
       />
     </Grid>
   );
