@@ -32,13 +32,12 @@ function Friends({
 
   useEffect(() => {
     scrollToBottom();
-  }, [selectedIndex]);
+    // if the messages aren't read
+    if (friends[selectedIndex].unRead) setRead(friends, selectedIndex);
+  }, [selectedIndex, friends]);
 
   const handleContactChange = (index) => {
     setSelectedIndex(index);
-
-    // if the messages aren't read
-    if (friends[index].unRead) setRead(friends, index);
   };
 
   const ref = useRef();

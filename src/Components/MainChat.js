@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { Grid } from "@material-ui/core";
 import Friends from "./FriendsTab";
 
@@ -21,7 +21,16 @@ function scrollToTop() {
   });
 }
 
-function MainChat({ user, friends, setFriends, setRead, messageConfirmation }) {
+function MainChat({
+  user,
+  friends,
+  setFriends,
+  selectedIndex,
+  setSelectedIndex,
+  setRead,
+  messageConfirmation,
+  receiveMessage,
+}) {
   useLayoutEffect(() => {
     function updateSize() {
       ref.current.style.setProperty(
@@ -34,7 +43,6 @@ function MainChat({ user, friends, setFriends, setRead, messageConfirmation }) {
     return () => window.removeEventListener("resize", updateSize);
   }, []);
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const ref = useRef();
 
   return (
@@ -54,6 +62,7 @@ function MainChat({ user, friends, setFriends, setRead, messageConfirmation }) {
         selectedIndex={selectedIndex}
         setSelectedIndex={setSelectedIndex}
         messageConfirmation={messageConfirmation}
+        receiveMessage={receiveMessage}
         scrollToBottom={scrollToBottom}
         scrollToTop={scrollToTop}
       />
@@ -65,6 +74,7 @@ const mapStateToProps = (state) => {
   return {
     user: state.auth.user,
     friends: state.chat.friends,
+    selectedIndex: state.chat.selectedIndex,
   };
 };
 
@@ -76,8 +86,14 @@ const mapDispatchToProps = (dispatch) => {
     setRead: (friends, index) => {
       dispatch({ type: "SET_READ", payload: { friends, index } });
     },
+    setSelectedIndex: (selectedIndex) => {
+      dispatch({ type: "SET_SELECTED_INDEX", payload: { selectedIndex } });
+    },
     messageConfirmation: (msg) => {
       dispatch({ type: "MESSAGE_CONFIRMATION", payload: { msg } });
+    },
+    receiveMessage: (msg) => {
+      dispatch({ type: "RECEIVE_MESSAGE", payload: { msg } });
     },
   };
 };

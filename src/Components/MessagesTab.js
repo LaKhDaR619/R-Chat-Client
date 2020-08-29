@@ -11,8 +11,8 @@ import {
 import io from "socket.io-client";
 import SendMessageTab from "./SendMessageTab";
 
-let socket = io("http://localhost:5000");
-//let socket = io("/");
+//let socket = io("http://localhost:5000");
+let socket = io("/");
 
 function MessagesTab({
   friends,
@@ -21,94 +21,42 @@ function MessagesTab({
   selectedIndex,
   setSelectedIndex,
   user,
+  receiveMessage,
   messageConfirmation,
   scrollToBottom,
   scrollToTop,
 }) {
+  // fix scrollToBottom(); problem
+
   const handleSocketEvent = (msg) => {
     let temp = [...friends];
 
     // if the message confirmation
     if (msg.sender === user.username) {
-      messageConfirmation(msg);
+      messageConfirmation(msg, setRead);
     }
     // if we received a message from another user
     else {
-      const foundIndex = temp.findIndex(
-        (friend) => friend.username === msg.sender
-      );
-
-      // sender in friends
-      if (foundIndex !== -1) {
-        temp[foundIndex].messages.push(msg);
-        // if we are in the senders chat we make the message read
-        // and change the senders chat to be on top
-        if (foundIndex === selectedIndex) {
-          setRead(friends, foundIndex);
-          setSelectedIndex(0);
-          scrollToTop();
-        }
-        // else we make it unRead
-        else {
-          temp[foundIndex].unRead = true;
-          if (foundIndex > selectedIndex) setSelectedIndex(selectedIndex + 1);
-        }
-
-        // getting the sender friend from the array
-        const friend = temp[foundIndex];
-        //delteting the friend from the array
-        temp.splice(foundIndex, 1);
-        // pushing it again at the beggining
-        temp.splice(0, 0, friend);
-      }
-      // sender isn't in friends (so we add it)
-      else {
-        console.log(temp);
-        temp.splice(0, 0, {
-          username: msg.sender,
-          messages: [msg],
-          unRead: true,
-        });
-        console.log(temp);
-        setSelectedIndex(selectedIndex + 1);
-      }
+      receiveMessage(msg);
 
       // playing receive message sound
-      document.getElementById("notification").muted = false;
-      document.getElementById("notification").play();
+      const notification = document.getElementById("notification");
+      notification.muted = false;
+      notification.play();
+      notification.muted = false;
     }
-
-    //console.log("81");
-    setFriends(temp);
   };
-
-  let end;
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [friends]);
-
-  const [start, setStart] = useState(0);
 
   useEffect(() => {
     // received a message
     console.log("on");
     socket.on(user.username, handleSocketEvent);
-    end = Date.now();
-    if (start && end) {
-      let elapsed = end - start;
-      console.log(elapsed);
-    }
 
     return () => {
-      // i'm adding and removing listner because selected Index
-      //didn't change inside this methode socket.on('')
-      // same thing happend with friends
-      setStart(Date.now());
       console.log("off");
       socket.off(user.username);
     };
-  }, [user.username, selectedIndex]);
+  }, [user.username]);
 
   useLayoutEffect(() => {
     function updateSize() {
@@ -122,7 +70,6 @@ function MessagesTab({
     return () => window.removeEventListener("resize", updateSize);
   }, []);
 
-  const [pendingMessages, setPendingMessages] = useState([]);
   const ref = useRef();
 
   return (
@@ -130,7 +77,6 @@ function MessagesTab({
       item
       component={Grid}
       container
-      style={{ paddingLeft: 15 }}
       direction="column"
       xs={12}
       sm={8}
@@ -153,15 +99,17 @@ function MessagesTab({
           {friends.length > 0 && friends.length > selectedIndex
             ? friends[selectedIndex].messages.map((message, index) => (
                 <ListItem style={{ padding: 0 }} key={index}>
-                  <ListItemText>{`${message.sender}: ${message.message}`}</ListItemText>
-                  {message.pending ? (
+                  {message.pending || true ? (
                     <CircularProgress
                       size={25}
+                      variant={message.pending ? "indeterminate" : "static"}
+                      value={0}
                       style={{
                         marginRight: "10px",
                       }}
                     />
                   ) : null}
+                  <ListItemText>{`${message.sender}: ${message.message}`}</ListItemText>
                 </ListItem>
               ))
             : null}
@@ -170,6 +118,7 @@ function MessagesTab({
       <SendMessageTab
         friends={friends}
         selectedIndex={selectedIndex}
+        setSelectedIndex={setSelectedIndex}
         user={user}
         socket={socket}
         setFriends={setFriends}
