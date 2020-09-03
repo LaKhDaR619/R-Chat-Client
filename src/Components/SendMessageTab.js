@@ -1,7 +1,22 @@
 import React from "react";
 import { Grid, Button, TextField } from "@material-ui/core";
 
-function SendMessageTab({ message, setMessage, handleSendMessage }) {
+function SendMessageTab({
+  message,
+  setMessage,
+  handleSendMessage,
+  typing,
+  setTyping,
+}) {
+  const handleTextChange = (e) => {
+    setMessage(e.target.value);
+    if (e.target.value === "") {
+      setTyping(false);
+    } else if (!typing) {
+      setTyping(true);
+    }
+  };
+
   return (
     <Grid item container>
       <Grid item xs={8} sm={10}>
@@ -10,7 +25,7 @@ function SendMessageTab({ message, setMessage, handleSendMessage }) {
           type="text"
           style={{ width: "100%", marginLeft: "5px" }}
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={handleTextChange}
           onKeyPress={(e) => {
             if (e.key === "Enter") handleSendMessage();
           }}

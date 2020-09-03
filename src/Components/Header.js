@@ -24,6 +24,11 @@ function Header({ loggedIn, logOut, user }) {
         {loggedIn ? (
           <Grid container justify="flex-end" alignItems="center" spacing={2}>
             <Grid item>
+              <Typography variant="subtitle1" className={classes.title}>
+                {`id: ${user.id}`}
+              </Typography>
+            </Grid>
+            <Grid item>
               <Typography variant="h6" className={classes.title}>
                 {user.username}
               </Typography>

@@ -9,6 +9,8 @@ import {
   Box,
   ListItemText,
   Badge,
+  TextField,
+  FormHelperText,
 } from "@material-ui/core";
 
 function Friends({
@@ -16,17 +18,20 @@ function Friends({
   setRead,
   selectedIndex,
   setSelectedIndex,
-  scrollToBottom,
   showFriends,
   setShowFriends,
+  addFriend,
+  friendError,
 }) {
   useLayoutEffect(() => {
     function updateSize() {
-      if (ref.current)
+      if (ref.current) {
+        const extraHeight = 210;
         ref.current.style.setProperty(
           "height",
-          `${document.getElementById("root").clientHeight - 124}px`
+          `${document.getElementById("root").clientHeight - extraHeight}px`
         );
+      }
 
       if (window.innerWidth >= 600) setDisplay("block");
       else setDisplay(showFriends ? "block" : "none");
@@ -37,17 +42,16 @@ function Friends({
   }, [showFriends]);
 
   useEffect(() => {
-    scrollToBottom();
     // if the messages aren't read
-    if (friends[selectedIndex].unRead) setRead(friends, selectedIndex);
-  }, [selectedIndex, friends, scrollToBottom, setRead]);
+    if (friends.length > 0 && friends[selectedIndex].unRead)
+      setRead(friends, selectedIndex);
+  }, [selectedIndex, friends, setRead]);
 
   const handleContactChange = (index) => {
     setSelectedIndex(index);
 
-    setShowFriends(false);
+    if (showFriends) setShowFriends(false);
   };
-
   // display stuff
   const [display, setDisplay] = useState("block");
   useEffect(() => {
@@ -57,6 +61,11 @@ function Friends({
     }
   }, [showFriends]);
 
+  const handleAddFriend = () => {
+    addFriend(friendId, friends);
+  };
+
+  const [friendId, setFriendId] = useState("");
   const ref = useRef();
 
   return (
@@ -89,6 +98,30 @@ function Friends({
           );
         })}
       </List>
+      <TextField
+        variant="outlined"
+        label="Add Friend"
+        style={{
+          width: "95%",
+          marginTop: "10px",
+          marginLeft: "5px",
+          marginRight: "5px",
+        }}
+        value={friendId}
+        onChange={(e) => setFriendId(e.target.value)}
+        onKeyPress={(e) => {
+          if (e.key === "Enter") handleAddFriend();
+        }}
+        error={friendError.length > 0}
+      />
+      <FormHelperText
+        style={{
+          marginLeft: "10px",
+        }}
+        error={true}
+      >
+        {friendError}
+      </FormHelperText>
     </Box>
   );
 }

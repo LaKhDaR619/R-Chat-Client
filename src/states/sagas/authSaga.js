@@ -13,7 +13,7 @@ export function* checkLogin() {
       const data = await res.json();
 
       const loggedIn = data.loggedIn;
-      const user = { username: data.user.username };
+      const user = { username: data.user.username, id: data.user.id };
       friends = data.user.friends;
 
       return {
@@ -53,9 +53,8 @@ export function* userLogin({ payload }) {
         case 200: {
           history.push("/chat");
           let user = await res.json();
-
           friends = user.friends;
-          user = { username: user.username };
+          user = { username: user.username, id: user.id };
 
           return { type: "USER_LOGIN_SUCCESS", payload: { user } };
         }

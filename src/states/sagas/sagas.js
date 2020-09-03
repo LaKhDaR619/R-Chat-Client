@@ -6,7 +6,7 @@ import {
   userRegister,
   checkUserName,
 } from "./authSaga";
-import { setRead } from "./chatSaga";
+import { setRead, addFriend } from "./chatSaga";
 
 export default function* mySaga() {
   // auth
@@ -18,4 +18,5 @@ export default function* mySaga() {
 
   // chat
   yield takeLatest("SET_READ", setRead);
+  yield takeLatest("ADD_FRIEND", addFriend);
 }

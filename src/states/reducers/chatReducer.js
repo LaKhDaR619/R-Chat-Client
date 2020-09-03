@@ -1,6 +1,7 @@
 const initialState = {
   friends: [],
   selectedIndex: 0,
+  friendError: "",
 };
 
 const chatReducer = (state = initialState, action) => {
@@ -24,12 +25,20 @@ const chatReducer = (state = initialState, action) => {
         (friend) => friend.username === msg.receiver
       );
 
-      const messageIndex = temp[friendIndex].messages.findIndex(
-        (message) => message.pending && message.message === msg.message
-      );
+      let messageFound = false;
 
-      // removing pending
-      temp[friendIndex].messages[messageIndex].pending = false;
+      for (let i = temp[friendIndex].messages.length - 1; i >= 0; i--) {
+        // this condition means that we arrived at the messages  from the server
+        if (temp[friendIndex].messages[i]._id !== undefined) break;
+
+        if (temp[friendIndex].messages[i].message === msg.message) {
+          temp[friendIndex].messages[i].pending = false;
+          messageFound = true;
+          break;
+        }
+      }
+
+      if (!messageFound) temp[friendIndex].messages.push(msg);
 
       return {
         ...state,
@@ -49,17 +58,15 @@ const chatReducer = (state = initialState, action) => {
       // sender in friends
       if (foundIndex !== -1) {
         temp[foundIndex].messages.push(msg);
-        // if we are in the senders chat we make the message read
-        // and change the senders chat to be on top
+
+        temp[foundIndex].unRead = true;
+        // if we are in the senders chat we make him on top
         if (foundIndex === selectedIndex) {
           selectedIndex = 0;
-          temp[foundIndex].unRead = true;
-
           scrollToTop();
         }
         // else we make it unRead
         else {
-          temp[foundIndex].unRead = true;
           if (foundIndex > selectedIndex) selectedIndex++;
         }
 
@@ -90,6 +97,35 @@ const chatReducer = (state = initialState, action) => {
         ...state,
         friends: temp,
         selectedIndex,
+      };
+    }
+    case "SOMEONE_TYPING": {
+      const { typing, typer } = action.payload;
+      const temp = [...state.friends];
+
+      const friendIndex = temp.findIndex((friend) => friend.username === typer);
+
+      if (friendIndex !== -1) {
+        temp[friendIndex].typing = typing;
+      }
+
+      return {
+        ...state,
+        friends: temp,
+      };
+    }
+    case "ADD_FRIEND_SUCCESS": {
+      alert(`${action.payload.friends[0].username} added to friend list`);
+      return {
+        ...state,
+        ...action.payload,
+        friendError: "",
+      };
+    }
+    case "ADD_FRIEND_FAILED": {
+      return {
+        ...state,
+        ...action.payload,
       };
     }
     default:

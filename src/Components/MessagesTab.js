@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import {
   Grid,
-  Box,
   Hidden,
   List,
   Typography,
@@ -9,12 +8,13 @@ import {
   CircularProgress,
   ListItem,
   Button,
-  colors,
 } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 
 import io from "socket.io-client";
 import SendMessageTab from "./SendMessageTab";
+
+import Typing from "./Typing";
 
 let socket;
 
@@ -30,10 +30,18 @@ function MessagesTab({
   scrollToTop,
   showFriends,
   backToFriends,
+  scrollToBottom,
+  someoneTyping,
 }) {
   const handleSocketEvent = (msg) => {
+    // if someone add us as a friend
+    if (msg.friend) {
+      const temp = [...friends];
+      temp.splice(0, 0, msg.friend);
+      setFriends(temp);
+    }
     // if the message confirmation
-    if (msg.sender === user.username) {
+    else if (msg.sender === user.username) {
       messageConfirmation(msg, setRead);
     }
     // if we received a message from another user
@@ -49,10 +57,13 @@ function MessagesTab({
   };
 
   const [message, setMessage] = useState("");
+  const [typing, setTyping] = useState(false);
 
   const handleSendMessage = () => {
     if (!message) return;
     setMessage("");
+    setTyping(false);
+    socket.emit("typing", false);
 
     const receiver = {
       receiver: friends[selectedIndex].username,
@@ -84,12 +95,17 @@ function MessagesTab({
     setFriends(temp);
   };
 
+  const handleTypingEvent = (msg) => {
+    someoneTyping(msg);
+  };
+
   useEffect(() => {
-    socket = io("/", { forceNew: true });
+    socket = io("/");
 
     // received a message
     console.log("on");
     socket.on(user.username, handleSocketEvent);
+    socket.on("typing", handleTypingEvent);
 
     return () => {
       console.log("off");
@@ -101,18 +117,22 @@ function MessagesTab({
     function updateSize() {
       if (window.innerWidth >= 600) {
         setDisplay("block");
-        if (ref.current)
+        if (ref.current) {
+          const extraHeight = typing ? 240 : 185;
           ref.current.style.setProperty(
             "height",
-            `${document.getElementById("root").clientHeight - 185}px`
+            `${document.getElementById("root").clientHeight - extraHeight}px`
           );
+        }
       } else {
         setDisplay(showFriends ? "none" : "block");
-        if (ref.current)
+        if (ref.current) {
+          const extraHeight = typing ? 230 : 175;
           ref.current.style.setProperty(
             "height",
-            `${document.getElementById("root").clientHeight - 177}px`
+            `${document.getElementById("root").clientHeight - extraHeight}px`
           );
+        }
       }
     }
     window.addEventListener("resize", updateSize);
@@ -128,6 +148,18 @@ function MessagesTab({
       setDisplay(showFriends ? "none" : "block");
     }
   }, [showFriends]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [selectedIndex, friends, scrollToBottom]);
+
+  useEffect(() => {
+    scrollToTop();
+  }, [friends, scrollToTop]);
+
+  useEffect(() => {
+    socket.emit("typing", typing);
+  }, [typing]);
 
   const ref = useRef();
 
@@ -190,6 +222,9 @@ function MessagesTab({
               ))
             : null}
         </List>
+        {friends.length > 0 && friends[selectedIndex].typing ? (
+          <Typing />
+        ) : null}
       </Grid>
       <SendMessageTab
         friends={friends}
@@ -200,6 +235,8 @@ function MessagesTab({
         setFriends={setFriends}
         message={message}
         setMessage={setMessage}
+        typing={typing}
+        setTyping={setTyping}
         handleSendMessage={handleSendMessage}
       />
     </Grid>

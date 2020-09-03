@@ -30,6 +30,9 @@ function MainChat({
   setRead,
   messageConfirmation,
   receiveMessage,
+  someoneTyping,
+  addFriend,
+  friendError,
 }) {
   useLayoutEffect(() => {
     function updateSize() {
@@ -49,7 +52,7 @@ function MainChat({
   const [showFriends, setShowFriends] = useState(false);
 
   const backToFriends = () => {
-    setShowFriends(true);
+    if (!showFriends) setShowFriends(true);
   };
 
   return (
@@ -62,6 +65,8 @@ function MainChat({
         scrollToBottom={scrollToBottom}
         showFriends={showFriends}
         setShowFriends={setShowFriends}
+        addFriend={addFriend}
+        friendError={friendError}
       />
       <MessagesTab
         user={user}
@@ -76,6 +81,7 @@ function MainChat({
         scrollToTop={scrollToTop}
         showFriends={showFriends}
         backToFriends={backToFriends}
+        someoneTyping={someoneTyping}
       />
       <audio id="notification" src={require("../assets/stairs.mp3")} muted />
     </Grid>
@@ -87,6 +93,7 @@ const mapStateToProps = (state) => {
     user: state.auth.user,
     friends: state.chat.friends,
     selectedIndex: state.chat.selectedIndex,
+    friendError: state.chat.friendError,
   };
 };
 
@@ -106,6 +113,12 @@ const mapDispatchToProps = (dispatch) => {
     },
     receiveMessage: (msg, scrollToTop) => {
       dispatch({ type: "RECEIVE_MESSAGE", payload: { msg, scrollToTop } });
+    },
+    someoneTyping: (msg) => {
+      dispatch({ type: "SOMEONE_TYPING", payload: msg });
+    },
+    addFriend: (id, friends) => {
+      dispatch({ type: "ADD_FRIEND", payload: { id, friends } });
     },
   };
 };

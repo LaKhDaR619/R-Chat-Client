@@ -24,3 +24,47 @@ export function* setRead({ payload }) {
 
   yield put(newAction);
 }
+
+export function* addFriend({ payload }) {
+  let { id, friends } = payload;
+  const temp = [...friends];
+
+  const newAction = yield call(async () => {
+    try {
+      // trying a methode send and not check if it is success (like facebook)
+      const res = await fetch("/chat/addFriend", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      if (res.status === 200) {
+        const friend = await res.json();
+        temp.splice(0, 0, friend);
+
+        return { type: "ADD_FRIEND_SUCCESS", payload: { friends: temp } };
+      } else if (res.status === 400) {
+        const { error } = await res.json();
+        return {
+          type: "ADD_FRIEND_FAILED",
+          payload: { friendError: error },
+        };
+      } else {
+        return {
+          type: "ADD_FRIEND_FAILED",
+          payload: { friendError: "Something went wrong" },
+        };
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        type: "ADD_FRIEND_FAILED",
+        payload: { friendError: "Something went wrong" },
+      };
+    }
+  });
+
+  yield put(newAction);
+}
