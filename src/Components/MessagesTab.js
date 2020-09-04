@@ -34,18 +34,22 @@ function MessagesTab({
   someoneTyping,
 }) {
   const handleSocketEvent = (msg) => {
+    // if someone typing
+    if (msg.type === "typing") {
+      someoneTyping(msg);
+    }
     // if someone add us as a friend
-    if (msg.friend) {
+    else if (msg.type === "addFriend") {
       const temp = [...friends];
       temp.splice(0, 0, msg.friend);
       setFriends(temp);
     }
     // if the message confirmation
-    else if (msg.sender === user.username) {
+    else if (msg.type === "confirm") {
       messageConfirmation(msg, setRead);
     }
     // if we received a message from another user
-    else {
+    else if (msg.type === "receive") {
       receiveMessage(msg, scrollToTop);
 
       // playing receive message sound
@@ -63,7 +67,10 @@ function MessagesTab({
     if (!message) return;
     setMessage("");
     setTyping(false);
-    socket.emit("typing", false);
+    socket.emit("typing", {
+      friend: friends[selectedIndex].username,
+      typing: false,
+    });
 
     const receiver = {
       receiver: friends[selectedIndex].username,
@@ -154,11 +161,11 @@ function MessagesTab({
   }, [selectedIndex, friends, scrollToBottom]);
 
   useEffect(() => {
-    scrollToTop();
-  }, [friends, scrollToTop]);
-
-  useEffect(() => {
-    socket.emit("typing", typing);
+    console.log(typing);
+    socket.emit("typing", {
+      friend: friends[selectedIndex].username,
+      typing,
+    });
   }, [typing]);
 
   const ref = useRef();
