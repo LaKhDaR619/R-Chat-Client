@@ -162,10 +162,12 @@ function MessagesTab({
 
   useEffect(() => {
     console.log(typing);
-    socket.emit("typing", {
-      friend: friends[selectedIndex].username,
-      typing,
-    });
+    if (friends.length > 0) {
+      socket.emit("typing", {
+        friend: friends[selectedIndex].username,
+        typing,
+      });
+    }
   }, [typing]);
 
   const ref = useRef();
