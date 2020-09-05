@@ -10,3 +10,7 @@
 - `npm start`
 
 ![Rchat](https://user-images.githubusercontent.com/25673946/92306578-14191400-ef88-11ea-9a36-a23efcb13cb9.png)
+
+## Live Test
+
+[Test The Site](https://chettos.herokuapp.com/)
